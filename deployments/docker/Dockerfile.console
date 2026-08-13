@@ -9,9 +9,8 @@ RUN npm ci
 
 COPY . .
 
-WORKDIR /app/apps/console
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+RUN npm run build:console
 
 FROM node:20-alpine AS runner
 

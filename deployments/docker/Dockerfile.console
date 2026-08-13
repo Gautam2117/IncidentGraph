@@ -5,11 +5,12 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/console/package.json ./apps/console/
 
-RUN npm install
+RUN npm ci
 
-COPY apps/console ./apps/console
+COPY . .
 
 WORKDIR /app/apps/console
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 FROM node:20-alpine AS runner
@@ -17,7 +18,8 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production \
-    PORT=3000
+    PORT=3000 \
+    NEXT_TELEMETRY_DISABLED=1
 
 COPY --from=builder --chown=node:node /app/apps/console/.next/standalone ./
 COPY --from=builder --chown=node:node /app/apps/console/.next/static ./apps/console/.next/static
@@ -26,4 +28,4 @@ EXPOSE 3000
 
 USER node
 
-CMD ["node", "apps/console/server.js"]
+CMD ["node", "server.js"]

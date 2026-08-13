@@ -135,7 +135,7 @@ jobs:
         run: |
           docker build -f deployments/docker/Dockerfile.control-plane -t incidentgraph/control-plane:ci .
           docker build -f deployments/docker/Dockerfile.console -t incidentgraph/console:ci .
-      - uses: aquasecurity/trivy-action@0.29.0
+      - uses: aquasecurity/trivy-action@master
         with:
           image-ref: incidentgraph/control-plane:ci
           severity: HIGH,CRITICAL

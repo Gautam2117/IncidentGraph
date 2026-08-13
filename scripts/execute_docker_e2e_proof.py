@@ -16,11 +16,12 @@ Executes the full production-style workflow against the running Docker stack:
 12. Telemetry backend validation (Prometheus metrics, Loki logs, Tempo traces)
 """
 
+import json
 import sys
 import time
-import json
-import httpx
 from pathlib import Path
+
+import httpx
 
 BASE_URL = "http://localhost:8000"
 GATEWAY_URL = "http://localhost:8001"
@@ -140,7 +141,7 @@ def main() -> None:
     avg_degraded = sum(degraded_latencies) / len(degraded_latencies)
     results["telemetry_before"] = {
         "avg_latency_ms": round(avg_degraded, 2),
-        "samples": [round(l, 2) for l in degraded_latencies],
+        "samples": [round(lat, 2) for lat in degraded_latencies],
     }
     print(f"  - Degraded average latency (BEFORE): {avg_degraded:.2f} ms")
 
@@ -233,21 +234,21 @@ def main() -> None:
     avg_recovered = sum(recovered_latencies) / len(recovered_latencies)
     results["telemetry_after"] = {
         "avg_latency_ms": round(avg_recovered, 2),
-        "samples": [round(l, 2) for l in recovered_latencies],
+        "samples": [round(lat, 2) for lat in recovered_latencies],
         "recovered": avg_recovered < avg_degraded,
     }
     print(f"  - Recovered average latency (AFTER): {avg_recovered:.2f} ms")
 
     # 9. Negative Security Boundary Proof (Requirement 3)
     print("\n[9/10] Executing negative security boundary tests...")
-    
+
     # 9a. Unknown action denied
     bad_action_resp = client.post(
         f"{BASE_URL}/api/v1/remediations/nonexistent_plan/execute",
         headers=headers,
         json={"incident_id": incident_id, "dry_run": False},
     )
-    
+
     # 9b. Unapproved / invalid execution denied
     unapproved_resp = client.post(
         f"{BASE_URL}/api/v1/remediations/invalid_plan_123/review",

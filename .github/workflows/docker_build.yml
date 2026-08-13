@@ -19,6 +19,7 @@ jobs:
           context: .
           file: deployments/docker/Dockerfile.control-plane
           push: false
+          load: true
           tags: incidentgraph/control-plane:latest
 
       - name: Build Console UI Image
@@ -27,4 +28,5 @@ jobs:
           context: .
           file: deployments/docker/Dockerfile.console
           push: false
+          load: true
           tags: incidentgraph/console:latest

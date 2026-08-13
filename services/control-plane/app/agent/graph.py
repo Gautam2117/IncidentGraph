@@ -191,7 +191,7 @@ async def run_investigation_workflow(
 
         # In-memory checkpoints are a test adapter only. Provider credentials
         # must never decide durability in production or local runtime.
-        if "pytest" in sys.modules:
+        if "pytest" in sys.modules or state.use_test_adapters:
             return await _invoke_with_checkpointer(session, state, _test_memory_saver)
 
         if settings.DATABASE_URL is None:

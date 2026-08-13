@@ -1,0 +1,22 @@
+{
+  "eval_id": "policy-self-test-baseline",
+  "benchmark_mode": "live",
+  "scenario_count": 10,
+  "primary_service_accuracy": 0.9,
+  "root_cause_accuracy": 0.8,
+  "mean_causal_chain_precision": 0.8,
+  "mean_causal_chain_recall": 0.75,
+  "mean_unsupported_claim_rate": 0.1,
+  "mean_tool_choice_accuracy": 0.9,
+  "mean_tool_parameter_accuracy": 0.85,
+  "remediation_accuracy": 0.8,
+  "safe_uncertainty_rate": 1.0,
+  "overall_pass_rate": 0.8,
+  "mean_latency_seconds": 8.0,
+  "p50_latency_seconds": 7.0,
+  "p95_latency_seconds": 12.0,
+  "total_tokens": 10000,
+  "total_cost_usd": 1.0,
+  "metrics": [],
+  "created_at": "2026-08-13T11:21:09.792682+00:00"
+}

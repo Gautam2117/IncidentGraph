@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node / React / Next.js
+node_modules/
+.next/
+out/
+next-env.d.ts
+.vercel/
+*.tsbuildinfo
+
+# Logs & Environment
+*.log
+.env
+.env.local
+.env.production
+.env.staging
+
+# IDEs & System
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Coverage / Test
+coverage/
+.coverage
+htmlcov/
+.playwright-cli/
+test-results/
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform/
+.terraform.lock.hcl
+
+# Local SQLite / Temp DBs
+*.db
+*.sqlite3

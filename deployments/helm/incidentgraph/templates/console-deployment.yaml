@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "incidentgraph.fullname" . }}-console
+  labels:
+    {{- include "incidentgraph.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: console
+  template:
+    metadata:
+      labels:
+        {{- include "incidentgraph.labels" . | nindent 8 }}
+        app.kubernetes.io/component: console
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: console
+          image: "{{ .Values.image.console.repository }}:{{ .Values.image.console.tag }}"
+          imagePullPolicy: {{ .Values.image.console.pullPolicy }}
+          ports:
+            - { name: http, containerPort: 3000 }
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: http://{{ include "incidentgraph.fullname" . }}-control-plane:8000
+          readinessProbe:
+            httpGet: { path: /login, port: http }
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet: { path: /login, port: http }
+            initialDelaySeconds: 20
+          resources:
+            {{- toYaml .Values.resources.console | nindent 12 }}
+          volumeMounts:
+            - { name: tmp, mountPath: /tmp }
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+      volumes:
+        - { name: tmp, emptyDir: {} }

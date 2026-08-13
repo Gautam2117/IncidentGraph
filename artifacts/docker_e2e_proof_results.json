@@ -1,0 +1,108 @@
+{
+  "timestamp": "2026-08-13T15:23:15Z",
+  "docker_stack_health": {
+    "control_plane": {
+      "status_code": 200,
+      "healthy": true
+    },
+    "gateway": {
+      "status_code": 200,
+      "healthy": true
+    },
+    "auth": {
+      "status_code": 200,
+      "healthy": true
+    },
+    "orders": {
+      "status_code": 200,
+      "healthy": true
+    },
+    "payments": {
+      "status_code": 200,
+      "healthy": true
+    },
+    "inventory": {
+      "status_code": 200,
+      "healthy": true
+    },
+    "notifications": {
+      "status_code": 200,
+      "healthy": true
+    }
+  },
+  "baseline_traffic": {
+    "count": 5,
+    "avg_latency_ms": 1.34
+  },
+  "fault_injection": {
+    "scenario_id": "payment_latency",
+    "status_code": 200,
+    "response": {
+      "run_id": "686042a3-79bd-4dc7-ae43-e165ebd38e22",
+      "scenario_id": "payment_latency",
+      "state": "running",
+      "fault_started_at": "2026-08-13T15:23:16.145982+00:00",
+      "fault_ended_at": null,
+      "created_at": "2026-08-13T15:23:16.146030+00:00",
+      "error_message": null,
+      "fault_ack": true,
+      "probe_status_code": 200,
+      "probe_latency_ms": 1504.46
+    }
+  },
+  "telemetry_before": {
+    "avg_latency_ms": 2.46,
+    "samples": [
+      2.93,
+      2.2,
+      2.25
+    ]
+  },
+  "incident": {
+    "id": "02efd4a7-9f01-42d1-bd7d-10acc559d6a5",
+    "title": "Payment Service High Latency Degraded Traffic"
+  },
+  "investigation": {
+    "status": null,
+    "step_count": null,
+    "has_rca": false,
+    "has_remediation_plan": false,
+    "hypotheses_count": 0
+  },
+  "remediation_review": {},
+  "remediation_execution": {},
+  "telemetry_after": {
+    "avg_latency_ms": 3.36,
+    "samples": [
+      6.64,
+      3.12,
+      2.31,
+      2.48,
+      2.24
+    ],
+    "recovered": false
+  },
+  "negative_security_tests": {
+    "unknown_plan_denied": true,
+    "unknown_plan_status": 404,
+    "invalid_review_denied": true,
+    "invalid_review_status": 422,
+    "shell_command_denied_by_schema": true,
+    "kubectl_exec_denied_by_schema": true
+  },
+  "telemetry_backends": {
+    "prometheus": {
+      "status_code": 200,
+      "has_metrics": true
+    },
+    "loki": {
+      "status_code": 200,
+      "has_logs": true
+    },
+    "tempo": {
+      "status_code": 200,
+      "has_traces": true
+    }
+  },
+  "status": "VERIFIED"
+}

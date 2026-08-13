@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-08-13T15:37:42Z",
+  "terraform_version": "1.15.8",
+  "provider": "hashicorp/aws v5.100.0",
+  "validate": "SUCCESS",
+  "plan": {
+    "to_add": 47,
+    "to_change": 0,
+    "to_destroy": 0,
+    "status": "VERIFIED_STATIC_PLAN"
+  },
+  "aws_live_apply": {
+    "status": "EXTERNALLY_BLOCKED",
+    "reason": "AWS production credentials not provided in environment"
+  }
+}

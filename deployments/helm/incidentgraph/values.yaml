@@ -1,0 +1,68 @@
+replicaCount: 1
+
+# Create this Secret before installing the chart. Required keys are documented in
+# deployments/helm/README.md; secret material is intentionally absent from values.
+existingSecret: incidentgraph-secrets
+
+image:
+  controlPlane:
+    repository: incidentgraph/control-plane
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  console:
+    repository: incidentgraph/console
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  demoRepositoryPrefix: incidentgraph/demo-
+  demoTag: "1.0.0"
+  demoPullPolicy: IfNotPresent
+  postgres: pgvector/pgvector:pg16
+  redis: redis:7.4-alpine
+  otelCollector: otel/opentelemetry-collector-contrib:0.135.0
+  prometheus: prom/prometheus:v3.5.0
+  tempo: grafana/tempo:2.8.2
+  loki: grafana/loki:3.5.3
+  promtail: grafana/promtail:3.5.3
+  grafana: grafana/grafana:12.1.0
+
+service:
+  controlPlane:
+    type: ClusterIP
+    port: 8000
+  console:
+    type: ClusterIP
+    port: 3000
+
+postgres:
+  database: incidentgraph_db
+  user: incidentgraph
+  storageSize: 10Gi
+  storageClassName: ""
+
+redis:
+  storageSize: 2Gi
+  storageClassName: ""
+
+bootstrapAdmin:
+  email: admin@incidentgraph.local
+  fullName: IncidentGraph Administrator
+
+resources:
+  controlPlane:
+    requests: { cpu: 200m, memory: 512Mi }
+    limits: { cpu: "1", memory: 2Gi }
+  console:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { cpu: 500m, memory: 512Mi }
+  demo:
+    requests: { cpu: 50m, memory: 128Mi }
+    limits: { cpu: 500m, memory: 512Mi }
+
+ingress:
+  enabled: false
+  className: ""
+  host: incidentgraph.local
+
+serviceAccount:
+  create: true
+  name: ""

@@ -1,0 +1,254 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "incidentgraph.fullname" . }}-observability
+data:
+  otel-collector.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc: { endpoint: 0.0.0.0:4317 }
+          http: { endpoint: 0.0.0.0:4318 }
+    processors:
+      batch: {}
+      memory_limiter: { check_interval: 1s, limit_mib: 512 }
+    exporters:
+      otlp/tempo: { endpoint: {{ include "incidentgraph.fullname" . }}-tempo:4317, tls: { insecure: true } }
+      prometheus: { endpoint: 0.0.0.0:8889 }
+      debug: { verbosity: basic }
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlp/tempo]
+        metrics:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [prometheus]
+        logs:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [debug]
+  tempo.yaml: |
+    server: { http_listen_port: 3200 }
+    distributor:
+      receivers:
+        otlp:
+          protocols:
+            grpc: { endpoint: 0.0.0.0:4317 }
+            http: { endpoint: 0.0.0.0:4318 }
+    storage:
+      trace: { backend: local, local: { path: /var/tempo/traces }, wal: { path: /var/tempo/wal } }
+    compactor: { compaction: { block_retention: 24h } }
+  prometheus.yaml: |
+    global: { scrape_interval: 15s }
+    scrape_configs:
+      - job_name: otel-collector
+        static_configs: [{ targets: ["{{ include "incidentgraph.fullname" . }}-otel-collector:8889"] }]
+      - job_name: control-plane
+        metrics_path: /metrics
+        static_configs: [{ targets: ["{{ include "incidentgraph.fullname" . }}-control-plane:8000"] }]
+      - job_name: demo
+        metrics_path: /metrics
+        static_configs: [{ targets: ["gateway:8000", "auth:8000", "orders:8000", "payments:8000", "inventory:8000", "notifications:8000"] }]
+  loki.yaml: |
+    auth_enabled: false
+    server: { http_listen_port: 3100 }
+    common:
+      path_prefix: /var/loki
+      replication_factor: 1
+      ring: { instance_addr: 127.0.0.1, kvstore: { store: inmemory } }
+    schema_config:
+      configs:
+        - { from: 2024-01-01, store: tsdb, object_store: filesystem, schema: v13, index: { prefix: index_, period: 24h } }
+    storage_config: { filesystem: { directory: /var/loki/chunks } }
+  promtail.yaml: |
+    server: { http_listen_port: 9080, grpc_listen_port: 0 }
+    positions: { filename: /run/promtail/positions.yaml }
+    clients: [{ url: http://{{ include "incidentgraph.fullname" . }}-loki:3100/loki/api/v1/push }]
+    scrape_configs:
+      - job_name: kubernetes-pods
+        kubernetes_sd_configs: [{ role: pod }]
+        relabel_configs:
+          - { source_labels: [__meta_kubernetes_namespace], action: keep, regex: {{ .Release.Namespace | quote }} }
+          - { source_labels: [__meta_kubernetes_pod_node_name], target_label: __host__ }
+          - { source_labels: [__meta_kubernetes_pod_name], target_label: pod }
+          - { source_labels: [__meta_kubernetes_pod_container_name], target_label: container }
+          - { source_labels: [__meta_kubernetes_pod_uid, __meta_kubernetes_pod_container_name], separator: /, target_label: __path__, replacement: /var/log/pods/*$1/*.log }
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - { name: Prometheus, type: prometheus, access: proxy, url: http://{{ include "incidentgraph.fullname" . }}-prometheus:9090, isDefault: true }
+      - { name: Loki, type: loki, access: proxy, url: http://{{ include "incidentgraph.fullname" . }}-loki:3100 }
+      - { name: Tempo, type: tempo, access: proxy, url: http://{{ include "incidentgraph.fullname" . }}-tempo:3200 }
+---
+{{- $components := list
+  (dict "name" "otel-collector" "image" .Values.image.otelCollector "ports" (list 4317 4318 8889) "args" (list "--config=/etc/incidentgraph/otel-collector.yaml"))
+  (dict "name" "tempo" "image" .Values.image.tempo "ports" (list 3200 4317) "args" (list "-config.file=/etc/incidentgraph/tempo.yaml"))
+  (dict "name" "prometheus" "image" .Values.image.prometheus "ports" (list 9090) "args" (list "--config.file=/etc/incidentgraph/prometheus.yaml" "--storage.tsdb.path=/var/prometheus"))
+  (dict "name" "loki" "image" .Values.image.loki "ports" (list 3100) "args" (list "-config.file=/etc/incidentgraph/loki.yaml"))
+}}
+{{- range $component := $components }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "incidentgraph.fullname" $ }}-{{ $component.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app.kubernetes.io/instance: {{ $.Release.Name }}, app.kubernetes.io/component: {{ $component.name }} }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/instance: {{ $.Release.Name }}, app.kubernetes.io/component: {{ $component.name }} }
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: {{ $component.name }}
+          image: {{ $component.image | quote }}
+          args: {{ toJson $component.args }}
+          ports:
+            {{- range $port := $component.ports }}
+            - { name: p{{ $port }}, containerPort: {{ $port }} }
+            {{- end }}
+          volumeMounts:
+            - { name: config, mountPath: /etc/incidentgraph, readOnly: true }
+            - { name: data, mountPath: /var/{{ $component.name }} }
+            - { name: tmp, mountPath: /tmp }
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+      volumes:
+        - { name: config, configMap: { name: {{ include "incidentgraph.fullname" $ }}-observability } }
+        - { name: data, emptyDir: {} }
+        - { name: tmp, emptyDir: {} }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "incidentgraph.fullname" $ }}-{{ $component.name }}
+spec:
+  selector: { app.kubernetes.io/instance: {{ $.Release.Name }}, app.kubernetes.io/component: {{ $component.name }} }
+  ports:
+    {{- range $port := $component.ports }}
+    - { name: p{{ $port }}, port: {{ $port }}, targetPort: p{{ $port }} }
+    {{- end }}
+{{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "incidentgraph.fullname" . }}-grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app.kubernetes.io/instance: {{ .Release.Name }}, app.kubernetes.io/component: grafana }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/instance: {{ .Release.Name }}, app.kubernetes.io/component: grafana }
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: grafana
+          image: {{ .Values.image.grafana | quote }}
+          ports: [{ name: http, containerPort: 3000 }]
+          env:
+            - { name: GF_USERS_ALLOW_SIGN_UP, value: "false" }
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: {{ .Values.existingSecret }}, key: grafana-admin-password }
+          volumeMounts:
+            - { name: config, mountPath: /etc/grafana/provisioning/datasources/datasources.yaml, subPath: datasources.yaml, readOnly: true }
+            - { name: data, mountPath: /var/lib/grafana }
+            - { name: tmp, mountPath: /tmp }
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+      volumes:
+        - { name: config, configMap: { name: {{ include "incidentgraph.fullname" . }}-observability } }
+        - { name: data, emptyDir: {} }
+        - { name: tmp, emptyDir: {} }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "incidentgraph.fullname" . }}-grafana
+spec:
+  selector: { app.kubernetes.io/instance: {{ .Release.Name }}, app.kubernetes.io/component: grafana }
+  ports: [{ name: http, port: 3000, targetPort: http }]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "incidentgraph.fullname" . }}-promtail
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "incidentgraph.fullname" . }}-promtail
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "incidentgraph.fullname" . }}-promtail
+subjects:
+  - { kind: ServiceAccount, name: {{ include "incidentgraph.fullname" . }}-promtail }
+roleRef:
+  { apiGroup: rbac.authorization.k8s.io, kind: Role, name: {{ include "incidentgraph.fullname" . }}-promtail }
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "incidentgraph.fullname" . }}-promtail
+spec:
+  selector:
+    matchLabels: { app.kubernetes.io/instance: {{ .Release.Name }}, app.kubernetes.io/component: promtail }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/instance: {{ .Release.Name }}, app.kubernetes.io/component: promtail }
+    spec:
+      serviceAccountName: {{ include "incidentgraph.fullname" . }}-promtail
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: promtail
+          image: {{ .Values.image.promtail | quote }}
+          args: ["-config.file=/etc/incidentgraph/promtail.yaml"]
+          volumeMounts:
+            - { name: config, mountPath: /etc/incidentgraph, readOnly: true }
+            - { name: pods, mountPath: /var/log/pods, readOnly: true }
+            - { name: positions, mountPath: /run/promtail }
+            - { name: tmp, mountPath: /tmp }
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+      volumes:
+        - { name: config, configMap: { name: {{ include "incidentgraph.fullname" . }}-observability } }
+        - { name: pods, hostPath: { path: /var/log/pods } }
+        - { name: positions, emptyDir: {} }
+        - { name: tmp, emptyDir: {} }

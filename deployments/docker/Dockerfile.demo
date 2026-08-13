@@ -1,0 +1,19 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+COPY pyproject.toml /app/
+RUN pip install --no-cache-dir fastapi uvicorn httpx opentelemetry-api opentelemetry-sdk opentelemetry-instrumentation-fastapi opentelemetry-exporter-otlp prometheus-client requests
+
+COPY services/demo /app/services/demo
+
+RUN addgroup --system incidentgraph \
+    && adduser --system --ingroup incidentgraph incidentgraph \
+    && chown -R incidentgraph:incidentgraph /app
+
+ARG SERVICE_NAME
+ENV SERVICE_NAME=${SERVICE_NAME}
+ENV PYTHONPATH=/app
+
+USER incidentgraph
+
+CMD ["sh", "-c", "uvicorn services.demo.${SERVICE_NAME}.main:app --host 0.0.0.0 --port 8000"]

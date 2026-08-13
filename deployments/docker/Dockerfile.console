@@ -1,0 +1,29 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+COPY apps/console/package.json ./apps/console/
+
+RUN npm install
+
+COPY apps/console ./apps/console
+
+WORKDIR /app/apps/console
+RUN npm run build
+
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production \
+    PORT=3000
+
+COPY --from=builder --chown=node:node /app/apps/console/.next/standalone ./
+COPY --from=builder --chown=node:node /app/apps/console/.next/static ./apps/console/.next/static
+
+EXPOSE 3000
+
+USER node
+
+CMD ["node", "apps/console/server.js"]

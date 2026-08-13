@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-08-13T15:36:08Z",
+  "k8s_cluster": "kind-incidentgraph-test",
+  "namespace": "incidentgraph",
+  "helm_chart": "deployments/helm/incidentgraph",
+  "helm_status": "deployed",
+  "helm_revision": 8,
+  "workloads": {
+    "total_pods": 17,
+    "healthy_pods": 17,
+    "services": [
+      "demo-auth",
+      "demo-gateway",
+      "demo-inventory",
+      "demo-notifications",
+      "demo-orders",
+      "demo-payments",
+      "incidentgraph-console",
+      "incidentgraph-control-plane",
+      "incidentgraph-grafana",
+      "incidentgraph-loki",
+      "incidentgraph-otel-collector",
+      "incidentgraph-postgres-0",
+      "incidentgraph-prometheus",
+      "incidentgraph-promtail",
+      "incidentgraph-redis-0",
+      "incidentgraph-tempo",
+      "incidentgraph-worker"
+    ]
+  },
+  "smoke_flow": {
+    "auth_passed": true,
+    "scenarios_available": 36,
+    "incident_created": "b1fc7ea1-4ac5-4caa-b223-a0cd881c8bd0",
+    "investigation_triggered": true
+  },
+  "status": "VERIFIED"
+}

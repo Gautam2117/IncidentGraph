@@ -1,0 +1,36 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'control-plane'
+    static_configs:
+      - targets: ['control-plane:8000']
+
+  - job_name: 'gateway'
+    static_configs:
+      - targets: ['gateway:8001']
+
+  - job_name: 'auth'
+    static_configs:
+      - targets: ['auth:8002']
+
+  - job_name: 'orders'
+    static_configs:
+      - targets: ['orders:8003']
+
+  - job_name: 'payments'
+    static_configs:
+      - targets: ['payments:8004']
+
+  - job_name: 'inventory'
+    static_configs:
+      - targets: ['inventory:8005']
+
+  - job_name: 'notifications'
+    static_configs:
+      - targets: ['notifications:8006']
+
+  - job_name: 'otel-collector'
+    static_configs:
+      - targets: ['otel-collector:8889']

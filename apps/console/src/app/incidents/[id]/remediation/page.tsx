@@ -1,0 +1,22 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { apiFetch } from '@/lib/api';
+
+type Step = { step_number: number; action_type: string; description: string; target_service: string; parameters: Record<string, unknown> };
+type Plan = { plan_id: string; risk_level: string; requires_human_approval: boolean; approved: boolean; steps: Step[] };
+type Investigation = { status: string; remediation_plan?: Plan };
+
+export default function RemediationPage() {
+  const incidentId = useParams().id as string;
+  const [investigation, setInvestigation] = useState<Investigation | null>(null);
+  const [result, setResult] = useState<Record<string, unknown> | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const load = () => apiFetch<Investigation>(`investigations/${incidentId}`).then(setInvestigation).catch((e: Error) => setMessage(e.message));
+  useEffect(() => { void apiFetch<Investigation>(`investigations/${incidentId}`).then(setInvestigation).catch((e: Error) => setMessage(e.message)); }, [incidentId]);
+  const plan = investigation?.remediation_plan;
+  async function execute(dryRun: boolean) { if (!plan) return; setMessage(dryRun ? 'Running bounded preview…' : 'Executing approved plan…'); try { setResult(await apiFetch<Record<string, unknown>>(`remediations/${plan.plan_id}/execute`, { method: 'POST', body: JSON.stringify({ incident_id: incidentId, dry_run: dryRun }) })); setMessage(null); await load(); } catch (e) { setMessage(e instanceof Error ? e.message : 'Execution failed'); } }
+  async function review(decision: 'approve' | 'reject' | 'request_more_evidence') { if (!plan) return; setMessage(`Submitting ${decision}…`); try { await apiFetch(`remediations/${plan.plan_id}/review`, { method: 'POST', body: JSON.stringify({ incident_id: incidentId, decision }) }); await load(); setMessage('Decision recorded and durable workflow resumed.'); } catch (e) { setMessage(e instanceof Error ? e.message : 'Review failed'); } }
+  return <div className="space-y-6"><header><p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Human change gate</p><h1 className="mt-2 text-3xl font-semibold text-white">Remediation plan</h1><p className="mt-2 text-sm text-slate-400">Every action is allow-listed, schema-validated, recorded, and verified against post-change telemetry.</p></header>{message && <div className="rounded-lg border border-amber-900 bg-amber-950/30 p-3 text-sm text-amber-300">{message}</div>}{plan ? <><div className="flex gap-2 text-xs"><span className="rounded bg-slate-800 px-2 py-1 text-slate-300">risk: {plan.risk_level}</span><span className={`rounded px-2 py-1 ${plan.approved ? 'bg-emerald-950 text-emerald-300' : 'bg-amber-950 text-amber-300'}`}>{plan.approved ? 'approved' : 'awaiting approval'}</span></div><div className="space-y-3">{plan.steps.map((step) => <article key={step.step_number} className="rounded-xl border border-white/10 bg-slate-900/45 p-5"><p className="font-mono text-xs text-cyan-300">Step {step.step_number} · {step.action_type}</p><h2 className="mt-2 font-semibold text-white">{step.description}</h2><p className="mt-2 text-xs text-slate-500">Target: {step.target_service}</p><pre className="mt-3 overflow-auto rounded-lg bg-slate-950 p-3 text-xs text-slate-400">{JSON.stringify(step.parameters, null, 2)}</pre></article>)}</div><div className="flex flex-wrap gap-2"><button onClick={() => execute(true)} className="rounded-lg border border-white/10 px-4 py-2 text-xs text-slate-300">Dry-run preview</button><button onClick={() => review('approve')} className="rounded-lg bg-emerald-500 px-4 py-2 text-xs font-semibold text-slate-950">Approve</button><button onClick={() => review('request_more_evidence')} className="rounded-lg border border-cyan-900 px-4 py-2 text-xs text-cyan-300">Request evidence</button><button onClick={() => review('reject')} className="rounded-lg border border-rose-900 px-4 py-2 text-xs text-rose-300">Reject</button>{plan.approved && <button onClick={() => execute(false)} className="rounded-lg bg-cyan-400 px-4 py-2 text-xs font-semibold text-slate-950">Execute approved plan</button>}</div>{result && <pre className="overflow-auto rounded-xl border border-white/10 bg-slate-950 p-5 text-xs text-slate-300">{JSON.stringify(result, null, 2)}</pre>}</> : <p className="rounded-xl border border-white/10 p-8 text-center text-slate-500">No remediation plan exists for this investigation.</p>}</div>;
+}

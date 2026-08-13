@@ -1,0 +1,51 @@
+{
+  "eval_id": "run_1c240f3f",
+  "benchmark_mode": "offline",
+  "scenario_count": 3,
+  "primary_service_accuracy": 1.0,
+  "root_cause_accuracy": 0.0,
+  "mean_causal_chain_recall": 0.5,
+  "remediation_accuracy": 0.0,
+  "overall_pass_rate": 0.0,
+  "mean_latency_seconds": 0.17,
+  "total_cost_usd": 0.0,
+  "metrics": [
+    {
+      "scenario_id": "db_pool_exhaustion",
+      "scenario_title": "Database Connection Pool Exhaustion",
+      "primary_service_match": true,
+      "root_cause_match": false,
+      "causal_chain_recall": 0.5,
+      "remediation_match": false,
+      "latency_seconds": 0.17,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "passed": false
+    },
+    {
+      "scenario_id": "slow_query_missing_index",
+      "scenario_title": "Missing Database Index / Slow Query",
+      "primary_service_match": true,
+      "root_cause_match": false,
+      "causal_chain_recall": 0.5,
+      "remediation_match": false,
+      "latency_seconds": 0.21,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "passed": false
+    },
+    {
+      "scenario_id": "n_plus_one_query",
+      "scenario_title": "N+1 Database Query Pattern",
+      "primary_service_match": true,
+      "root_cause_match": false,
+      "causal_chain_recall": 0.5,
+      "remediation_match": false,
+      "latency_seconds": 0.14,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "passed": false
+    }
+  ],
+  "created_at": "2026-08-13T08:00:35.838138+00:00"
+}

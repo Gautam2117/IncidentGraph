@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'incidentgraph-control-plane'
+    static_configs:
+      - targets: ['control-plane:8000']
+
+  - job_name: 'incidentgraph-otel-collector'
+    static_configs:
+      - targets: ['otel-collector:8889']
+
+  - job_name: 'incidentgraph-demo-services'
+    static_configs:
+      - targets:
+          - 'gateway:8000'
+          - 'auth:8000'
+          - 'orders:8000'
+          - 'payments:8000'
+          - 'inventory:8000'
+          - 'notifications:8000'

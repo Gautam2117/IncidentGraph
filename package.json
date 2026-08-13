@@ -1,0 +1,14 @@
+{
+  "name": "incidentgraph-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:console": "npm --prefix apps/console run dev",
+    "build:console": "npm --prefix apps/console run build",
+    "lint": "npm --prefix apps/console run lint",
+    "typecheck": "npm --prefix apps/console run typecheck"
+  },
+  "workspaces": [
+    "apps/*"
+  ]
+}

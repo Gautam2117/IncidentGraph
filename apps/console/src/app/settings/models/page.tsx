@@ -1,0 +1,11 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { fetchModelProviders, ModelsOverview } from '@/lib/api';
+
+export default function ModelSettingsPage() {
+  const [overview, setOverview] = useState<ModelsOverview | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => { fetchModelProviders().then(setOverview).catch((e: Error) => setError(e.message)); }, []);
+  return <div className="space-y-6"><header><p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Admin diagnostics</p><h1 className="mt-2 text-3xl font-semibold text-white">Model providers</h1><p className="mt-2 text-sm text-slate-400">Live reachability is probed without exposing credentials. Test adapters are labeled and cannot satisfy live benchmark claims.</p></header>{error && <div className="rounded-lg border border-amber-900 bg-amber-950/30 p-4 text-sm text-amber-300">{error}. This surface requires an admin account.</div>}<div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">{overview?.providers.map((provider) => <article key={provider.name} className="rounded-xl border border-white/10 bg-slate-900/45 p-5"><div className="flex justify-between"><h2 className="font-semibold text-white capitalize">{provider.name}</h2><span className={`w-2 h-2 mt-1.5 rounded-full ${provider.reachable ? 'bg-emerald-400' : 'bg-slate-600'}`} /></div><p className="mt-3 font-mono text-xs text-cyan-300">{provider.default_model}</p><p className="mt-3 text-xs text-slate-500">{provider.detail}</p><div className="mt-4 flex gap-2"><span className="rounded bg-slate-800 px-2 py-1 text-[10px] text-slate-400">{provider.configured ? 'configured' : 'not configured'}</span>{provider.is_active && <span className="rounded bg-emerald-950 px-2 py-1 text-[10px] text-emerald-300">active</span>}</div></article>)}</div>{overview && <div className="rounded-xl border border-white/10 bg-slate-900/45 p-5"><h2 className="font-semibold text-white">Routing policy</h2><div className="mt-4 grid md:grid-cols-2 gap-2">{Object.entries(overview.routing_policy).map(([tier, model]) => <div key={tier} className="flex justify-between rounded-lg bg-slate-950/60 p-3 text-xs"><span className="text-slate-400 capitalize">{tier}</span><span className="font-mono text-cyan-300">{model}</span></div>)}</div></div>}</div>;
+}

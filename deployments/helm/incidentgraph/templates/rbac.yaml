@@ -1,0 +1,9 @@
+{{- if .Values.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "incidentgraph.serviceAccountName" . }}
+  labels:
+    {{- include "incidentgraph.labels" . | nindent 4 }}
+automountServiceAccountToken: false
+{{- end }}

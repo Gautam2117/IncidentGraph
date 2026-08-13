@@ -1,0 +1,80 @@
+{{- range $service := tuple "gateway" "auth" "orders" "payments" "inventory" "notifications" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-{{ $service }}
+  labels:
+    app.kubernetes.io/name: incidentgraph-demo
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/component: {{ $service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ $.Release.Name }}
+      app.kubernetes.io/component: {{ $service }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: incidentgraph-demo
+        app.kubernetes.io/instance: {{ $.Release.Name }}
+        app.kubernetes.io/component: {{ $service }}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: {{ $service }}
+          image: "{{ $.Values.image.demoRepositoryPrefix }}{{ $service }}:{{ $.Values.image.demoTag }}"
+          imagePullPolicy: {{ $.Values.image.demoPullPolicy }}
+          ports:
+            - { name: http, containerPort: 8000 }
+          env:
+            - { name: SERVICE_NAME, value: {{ $service | quote }} }
+            - { name: OTEL_EXPORTER_OTLP_ENDPOINT, value: "http://{{ include "incidentgraph.fullname" $ }}-otel-collector:4317" }
+            {{- if eq $service "gateway" }}
+            - { name: AUTH_SERVICE_URL, value: "http://auth:8000" }
+            - { name: ORDERS_SERVICE_URL, value: "http://orders:8000" }
+            {{- end }}
+            {{- if eq $service "orders" }}
+            - { name: INVENTORY_SERVICE_URL, value: "http://inventory:8000" }
+            - { name: PAYMENTS_SERVICE_URL, value: "http://payments:8000" }
+            {{- end }}
+          readinessProbe:
+            httpGet: { path: /health/ready, port: http }
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet: { path: /health/live, port: http }
+            initialDelaySeconds: 15
+          resources:
+            {{- toYaml $.Values.resources.demo | nindent 12 }}
+          volumeMounts:
+            - { name: tmp, mountPath: /tmp }
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+      volumes:
+        - { name: tmp, emptyDir: {} }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $service }}
+  labels:
+    app.kubernetes.io/name: incidentgraph-demo
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/component: {{ $service }}
+spec:
+  selector:
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/component: {{ $service }}
+  ports:
+    - { name: http, port: 8000, targetPort: http }
+{{- end }}

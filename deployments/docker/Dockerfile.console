@@ -2,12 +2,15 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY . .
+COPY package.json package-lock.json ./
+COPY apps/console/package.json ./apps/console/
 
 RUN npm ci
 
+COPY apps/console ./apps/console
+
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build:console
+RUN cd apps/console && npm run build
 
 FROM node:20-alpine AS runner
 

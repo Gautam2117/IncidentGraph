@@ -33,6 +33,7 @@ jobs:
       EMBEDDING_PROVIDER: mock
       EMBEDDING_MODEL: BAAI/bge-small-en-v1.5
       ENABLE_OFFLINE_MODEL_ADAPTER: "true"
+      PYTHONUNBUFFERED: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -40,9 +41,9 @@ jobs:
       - run: pip install -e ".[dev,local]"
       - run: PYTHONPATH=services/control-plane:. alembic -c services/control-plane/alembic.ini upgrade head
       - name: Offline evaluation smoke (never labeled live)
-        run: PYTHONPATH=services/control-plane:. python scripts/eval_runner.py --offline --scenarios db_pool_exhaustion,insufficient_evidence --no-export
+        run: PYTHONPATH=services/control-plane:. python -u scripts/eval_runner.py --offline --scenarios db_pool_exhaustion,insufficient_evidence --no-export
       - name: Prove degraded rejection and recovered acceptance
-        run: PYTHONPATH=services/control-plane:. python scripts/test_ai_regression_gate_cycle.py
+        run: PYTHONPATH=services/control-plane:. python -u scripts/test_ai_regression_gate_cycle.py
       - uses: actions/upload-artifact@v4
         with:
           name: regression-policy-proof

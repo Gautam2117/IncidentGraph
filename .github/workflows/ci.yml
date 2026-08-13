@@ -94,9 +94,9 @@ jobs:
       - run: pip install -e ".[dev,local]"
       - run: PYTHONPATH=services/control-plane:. alembic -c services/control-plane/alembic.ini upgrade head
       - run: npm ci
+      - run: npm run build:console
       - run: npm run typecheck
       - run: npm run lint
-      - run: npm run build:console
       - run: npx playwright install --with-deps chromium
       - name: Playwright authenticated workflow
         run: cd apps/console && INCIDENTGRAPH_PYTHON=python npx playwright test
@@ -138,6 +138,7 @@ jobs:
       - uses: aquasecurity/trivy-action@master
         with:
           image-ref: incidentgraph/control-plane:ci
+          format: table
           severity: HIGH,CRITICAL
           exit-code: "0"
           ignore-unfixed: true

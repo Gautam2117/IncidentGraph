@@ -89,6 +89,8 @@ jobs:
       OPENAI_API_KEY: mock-ci-key
       EMBEDDING_PROVIDER: local
       EMBEDDING_MODEL: BAAI/bge-small-en-v1.5
+      BOOTSTRAP_ADMIN_EMAIL: playwright-admin@incidentgraph.dev
+      BOOTSTRAP_ADMIN_PASSWORD: PlaywrightAdminPassword123!
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

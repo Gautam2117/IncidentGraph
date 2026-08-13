@@ -32,6 +32,7 @@ jobs:
       OPENAI_API_KEY: mock-ci-key
       EMBEDDING_PROVIDER: mock
       EMBEDDING_MODEL: BAAI/bge-small-en-v1.5
+      ENABLE_OFFLINE_MODEL_ADAPTER: "true"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

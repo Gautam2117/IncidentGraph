@@ -44,7 +44,7 @@ def route_next_node(state: InvestigationState) -> str:
             and not state.remediation_plan.approved
         ):
             if state.history and state.history[-1] == "human_review_gate_node":
-                pass
+                return "outcome"
             return "human_review"
         return "outcome"
     elif state.status in {"resolved", "remediation_failed", "remediation_inconclusive", "cancelled"}:

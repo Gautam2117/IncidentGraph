@@ -39,7 +39,7 @@
 
 - [x] **Feature Freeze**: No new architecture, frameworks, routes, or product features were added. Existing GodMode functionality is preserved.
 - [x] **Artifact Hygiene**: All historical evaluation files in `eval-results/` are registered and categorized as `CURRENT`, `SUPERSEDED`, or `REVOKED_CONTAMINATED` in [`eval-results/EVALUATION_ARTIFACT_REGISTRY.md`](./eval-results/EVALUATION_ARTIFACT_REGISTRY.md).
-- [x] **Metric Consistency**: Reconciled [README.md](./README.md), [RESUME_PROOF.md](./RESUME_PROOF.md), [VALIDATION_MATRIX.md](./VALIDATION_MATRIX.md), and [FINAL_VERIFICATION_REPORT.md](./FINAL_VERIFICATION_REPORT.md). Authoritative offline RAG Recall@5 = **91.2%**.
+- [x] **Metric Consistency**: Reconciled [README.md](./README.md), [RESUME_PROOF.md](./RESUME_PROOF.md), [VALIDATION_MATRIX.md](./VALIDATION_MATRIX.md), and [FINAL_VERIFICATION_REPORT.md](./FINAL_VERIFICATION_REPORT.md). Authoritative offline RAG Recall@5 = **100% (1.00 hybrid RRF, N=5)**.
 - [x] **Secret Hygiene**: Scanned workspace for credentials. `.env` is ignored by `.gitignore`. [.env.example](./.env.example) contains safe placeholders.
 - [x] **Interview Package Created**:
   - [`docs/interview/INCIDENTGRAPH_10_MINUTE_WALKTHROUGH.md`](./docs/interview/INCIDENTGRAPH_10_MINUTE_WALKTHROUGH.md)

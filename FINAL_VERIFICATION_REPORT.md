@@ -8,7 +8,7 @@
 
 | Category | Requirement | Execution Status | Provenance & Evidence Artifact |
 |---|---|---|---|
-| **1. AI Reasoning Quality** | Live Model Evaluation | `EXTERNALLY_BLOCKED` | Configured `OPENAI_API_KEY` is dummy placeholder (`mock-key-or-set-your-key`). Offline RAG Recall@5 verified at 91.2%. |
+| **1. AI Reasoning Quality** | Live Model Evaluation | `EXTERNALLY_BLOCKED` | Configured `OPENAI_API_KEY` is dummy placeholder (`mock-key-or-set-your-key`). Offline RAG Recall@5 verified at 100% (1.00 hybrid RRF, N=5). |
 | **2. Docker E2E Stack** | Clean Rebuild & Launch | `VERIFIED` | Clean rebuild via `docker-compose down -v`, `build`, `up -d`. All 17 microservice/observability containers UP and healthy. |
 | **3. Real Remediation Proof** | Sandbox Execution & Security | `VERIFIED` | Full E2E executed: baseline latency (1.34ms) -> fault injection -> degraded latency (2.46ms) -> incident creation -> LangGraph investigation -> human review approval -> sandbox remediation -> recovery (3.36ms). Security boundaries verified (unknown plan denied 404, invalid review denied 422, shell injection denied by schema). (`artifacts/docker_e2e_proof_results.json`) |
 | **4. Performance & Security** | Automated Audits & Load Suite | `VERIFIED` | • Pytest: 81 tests passing (`100% pass`) <br> • Coverage: 80% (3,529 LOC) <br> • Bandit: 7,777 LOC scanned, 0 High / 0 Medium issues <br> • `pip-audit`: 0 vulnerabilities <br> • `npm audit`: 0 vulnerabilities <br> • k6: 5,101 reqs, 168 req/s, 100.00% success, p95=84.41ms |

@@ -6,7 +6,7 @@ Every value below is backed by explicit, reproducible execution evidence generat
 |---|---|---|---|---|
 | Microservices Stack | 6 demo microservices + control-plane, console, worker | `docker-compose.yml`, `deployments/helm/` | 2026-08-13T15:30:00Z | `VERIFIED` |
 | Scenario Suite | 36 scenarios | `services/control-plane/app/scenarios/registry.py` | 2026-08-13T15:36:08Z | `VERIFIED` |
-| RAG Retrieval Recall@5 | 91.2% (1.00 pgvector + FTS RRF hybrid) | `eval-results/rag_benchmark.json` | 2026-08-13T15:54:26Z | `VERIFIED` |
+| RAG Retrieval Recall@5 | 100% (1.00 pgvector + FTS RRF hybrid, N=5) | `eval-results/rag_benchmark.json` | 2026-08-13T15:54:26Z | `VERIFIED` |
 | Pytest Test Suite | 81 tests passing | `pytest services/control-plane/tests` | 2026-08-13T15:23:29Z | `VERIFIED` |
 | Python Code Coverage | 80% (3,529 LOC, 699 missed) | `pytest --cov=app --cov-report=term-missing` | 2026-08-13T15:23:29Z | `VERIFIED` |
 | Security Static Analysis | 7,777 LOC scanned, 0 High, 0 Medium issues | `bandit -r services/control-plane/app` | 2026-08-13T15:23:33Z | `VERIFIED` |
@@ -26,7 +26,7 @@ Every value below is backed by explicit, reproducible execution evidence generat
 ### Verified Resume Bullets (`VERIFIED`)
 
 - **Distributed Systems & Observability**: Architected an autonomous incident investigation platform across **6 microservices**, coordinating durable multi-agent LangGraph roles with PostgreSQL state checkpointing to analyze OpenTelemetry traces, Loki logs, and Prometheus metrics.
-- **Search & Retrieval Systems**: Engineered a hybrid RAG retrieval engine combining **PostgreSQL `pgvector` embeddings** and **Full-Text Search (RRF ranking)**, achieving **91.2% Recall@5** on operational runbooks and service postmortems.
+- **Search & Retrieval Systems**: Engineered a hybrid RAG retrieval engine combining **PostgreSQL `pgvector` embeddings** and **Full-Text Search (RRF ranking)**, achieving **100% Recall@5 (N=5)** on operational runbooks and service postmortems.
 - **Reliability & Quality Engineering**: Built a continuous evaluation harness with **80% test coverage (81 pytest backend tests passing)**, zero vulnerability dependency audits (`pip-audit`, `npm audit`), Playwright E2E browser automation across 19 console routes, and **k6 load testing (5,101 requests at 168 req/s with 0% error rate and p95 latency of 84.41 ms)**.
 - **Cloud & Container Infrastructure**: Production-packaged with Docker Compose (17 containers), Helm on Kubernetes (17/17 pods 1/1 `Running` on kind cluster), and Terraform IaC (47-resource static plan).
 

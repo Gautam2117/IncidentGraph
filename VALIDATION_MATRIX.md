@@ -11,7 +11,7 @@ All local non-external implementation and verification items are **VERIFIED**. L
 | Incident ingestion | manual + scenario + webhook paths work | API/E2E tests | `VERIFIED` (`app/services/incident_service.py`) |
 | Tool safety | no arbitrary SQL/shell/URL/filesystem | negative security tests | `VERIFIED` (Pydantic schema validation & `test_tools_security.py`) |
 | RAG | vector + lexical + RRF working | retrieval tests | `VERIFIED` (`app/rag/store.py` & `test_rag.py`) |
-| RAG benchmark | retrieval metrics recorded | immutable eval artifact | `VERIFIED` (Offline RAG Recall@5 = 91.2% / 1.00 pgvector+FTS hybrid in `eval-results/rag_benchmark.json`) |
+| RAG benchmark | retrieval metrics recorded | immutable eval artifact | `VERIFIED` (Offline RAG Recall@5 = 100% / 1.00 pgvector+FTS hybrid in `eval-results/rag_benchmark.json`, N=5) |
 | Provider abstraction | primary + alternate/local + fake | contract tests | `VERIFIED` (`app/models/gemini_provider.py`, `ollama_provider.py`, `fake_provider.py`) |
 | Agent graph | durable explicit LangGraph path | graph tests + persisted events | `VERIFIED` (`app/agent/graph.py` & `test_agent_graph.py`) |
 | Contradiction | skeptic verifier can reject hypothesis | benchmark case | `VERIFIED` (`skeptic_verifier_node` in `app/agent/nodes.py`) |

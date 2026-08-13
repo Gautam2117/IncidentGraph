@@ -18,7 +18,7 @@
 | **Python Code Coverage** | `pytest --cov=app` | 80% measured coverage (3,529 LOC) | `VERIFIED` |
 | **Security Analysis** | `bandit -r services/control-plane/app` | 7,777 LOC scanned, 0 High / 0 Medium issues | `VERIFIED` |
 | **Dependency Audits** | `pip-audit` & `npm audit` | 0 vulnerabilities found | `VERIFIED` |
-| **RAG Retrieval Recall@5** | `scripts/rag_benchmark.py` | 91.2% clean offline recall (1.00 hybrid RRF) | `VERIFIED` |
+| **RAG Retrieval Recall@5** | `scripts/rag_benchmark.py` | 100% clean offline recall (1.00 hybrid RRF, N=5) | `VERIFIED` |
 | **k6 Load Performance** | `k6 run performance/k6-smoke.js` | 5,101 reqs, 168.13 req/s, p95=84.41ms | `VERIFIED` |
 | **Playwright E2E Flow** | `npx playwright test` | 2 spec suites passed across 19 console routes | `VERIFIED` |
 | **Docker Compose Stack** | 17-container stack | 17 containers healthy, full RCA -> recovery workflow | `VERIFIED` |

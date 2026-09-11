@@ -109,6 +109,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Playwright authenticated workflow
         run: cd apps/console && INCIDENTGRAPH_PYTHON=python npx playwright test
+      - name: Playwright showcase workflow
+        run: cd apps/console && npm run test:e2e:showcase
 
   infrastructure-static:
     runs-on: ubuntu-latest

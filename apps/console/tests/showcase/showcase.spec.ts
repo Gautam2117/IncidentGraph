@@ -12,7 +12,13 @@ test.describe('public portfolio showcase', () => {
     await expect(page.getByText('Showcase mode')).toBeVisible();
   });
 
-  test('serves deterministic console data and mutation previews', async ({ page }) => {
+  test('serves deterministic console data and mutation previews', async ({ page, request }) => {
+    const healthResponse = await request.get('/api/proxy/health/ready');
+    expect(healthResponse.ok()).toBeTruthy();
+    const health = await healthResponse.json();
+    expect(health.status).toBe('ready');
+    expect(Date.now() - Date.parse(health.timestamp)).toBeLessThan(60_000);
+
     await page.goto('/scenarios');
     await expect(page.getByRole('heading', { name: 'Chaos scenarios' })).toBeVisible();
     await page.getByRole('button', { name: 'Inject & probe' }).first().click();

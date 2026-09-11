@@ -188,8 +188,8 @@ export function isDemoMode() {
 export function demoResponse(method: string, segments: string[], searchParams: URLSearchParams): Response {
   const path = segments.join('/');
   if (path === 'auth/me') return Response.json({ email: 'recruiter@showcase.demo', username: 'Portfolio Guest', role: 'viewer' });
-  if (path === 'health/live') return Response.json({ status: 'healthy', timestamp: now, service: 'incidentgraph-showcase' });
-  if (path === 'health/ready') return Response.json({ status: 'ready', timestamp: now, components: { showcase: { status: 'healthy', message: 'Verified artifact replay' }, deployment: { status: 'healthy', message: 'Vercel serverless' } } });
+  if (path === 'health/live') return Response.json({ status: 'healthy', timestamp: new Date().toISOString(), service: 'incidentgraph-showcase' });
+  if (path === 'health/ready') return Response.json({ status: 'ready', timestamp: new Date().toISOString(), components: { showcase: { status: 'healthy', message: 'Verified artifact replay' }, deployment: { status: 'healthy', message: 'Vercel serverless' } } });
   if (path === 'health/version') return Response.json({
     name: 'IncidentGraph',
     version: '1.0.1',

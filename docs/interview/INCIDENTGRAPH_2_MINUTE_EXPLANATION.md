@@ -29,3 +29,5 @@ Unlike traditional AI wrappers that hallucinate RCA causes or leak test data, In
 5. **Evaluation & Provenance**:
    - Features an automated AI evaluation engine and regression gate (`.github/workflows/ai_regression_gate.yml`).
    - Local stack verified across 17 Docker containers, 17 Kubernetes workloads on a local `kind` cluster, and 47 Terraform IaC resources.
+
+6. **Live Showcase**: A public, account-free interactive demo is deployed at [incidentgraph.vercel.app](https://incidentgraph.vercel.app). It replays deterministic proof data through the real console UI. The full backend is locally/container verified; the AWS plan is static-verified but intentionally not applied; live-model AI quality is not claimed without provider credentials.

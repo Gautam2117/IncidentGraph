@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname === '/' || process.env.INCIDENTGRAPH_DEMO_MODE === 'true') {
+    return NextResponse.next();
+  }
   if (!request.cookies.has('incidentgraph_session')) {
     const login = new URL('/login', request.url);
     login.searchParams.set('returnTo', request.nextUrl.pathname);
@@ -10,5 +13,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|login|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!api|login|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)'],
 };

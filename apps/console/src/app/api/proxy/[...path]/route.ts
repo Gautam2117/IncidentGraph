@@ -1,14 +1,20 @@
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
+import { demoResponse, isDemoMode } from '@/lib/demo-data';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 async function forward(request: NextRequest, path: string[]) {
   if (!['GET', 'HEAD'].includes(request.method)) {
     const origin = request.headers.get('origin');
-    if (!origin || origin !== request.nextUrl.origin) {
+    const host = request.headers.get('host');
+    const allowedOrigins = new Set([request.nextUrl.origin, `http://${host}`, `https://${host}`]);
+    if (!origin || !allowedOrigins.has(origin)) {
       return Response.json({ message: 'Cross-origin request rejected' }, { status: 403 });
     }
+  }
+  if (isDemoMode()) {
+    return demoResponse(request.method, path, request.nextUrl.searchParams);
   }
   const token = (await cookies()).get('incidentgraph_session')?.value;
   if (!token) {
@@ -20,12 +26,17 @@ async function forward(request: NextRequest, path: string[]) {
   const contentType = request.headers.get('content-type');
   if (contentType) headers.set('content-type', contentType);
   const hasBody = !['GET', 'HEAD'].includes(request.method);
-  const upstream = await fetch(target, {
-    method: request.method,
-    headers,
-    body: hasBody ? await request.text() : undefined,
-    cache: 'no-store',
-  });
+  let upstream: Response;
+  try {
+    upstream = await fetch(target, {
+      method: request.method,
+      headers,
+      body: hasBody ? await request.text() : undefined,
+      cache: 'no-store',
+    });
+  } catch {
+    return Response.json({ message: 'The control plane is temporarily unreachable' }, { status: 502 });
+  }
   const responseHeaders = new Headers();
   const upstreamContentType = upstream.headers.get('content-type');
   if (upstreamContentType) responseHeaders.set('content-type', upstreamContentType);

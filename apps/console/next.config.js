@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
+  agentRules: false,
+  ...(process.env.VERCEL ? {} : { output: 'standalone' }),
   async headers() {
     return [
       {

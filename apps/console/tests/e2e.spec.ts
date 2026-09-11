@@ -15,7 +15,7 @@ test.describe('IncidentGraph authenticated engineering console', () => {
     await expect(page.getByRole('heading', { name: 'Active & Historical Incidents' })).toBeVisible();
 
     const routes: Array<[string, string]> = [
-      ['/', 'Investigate with evidence. Remediate with control.'],
+      ['/dashboard', 'Investigate with evidence. Remediate with control.'],
       ['/topology', 'Service Dependency Topology'],
       ['/knowledge', 'Knowledge index'],
       ['/knowledge/debug', 'Inspect ranked evidence'],

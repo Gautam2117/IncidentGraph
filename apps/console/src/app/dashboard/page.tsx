@@ -1,3 +1,8 @@
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
+import OperationalOverview from '@/components/OperationalOverview';
 
-export default function DashboardPage() { redirect('/'); }
+export const metadata: Metadata = { title: 'Engineering Console' };
+
+export default function DashboardPage() {
+  return <OperationalOverview />;
+}

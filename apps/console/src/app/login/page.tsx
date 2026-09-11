@@ -26,7 +26,7 @@ export default function LoginPage() {
       return;
     }
     const returnTo = new URLSearchParams(window.location.search).get('returnTo');
-    router.replace(returnTo?.startsWith('/') ? returnTo : '/');
+    router.replace(returnTo?.startsWith('/') ? returnTo : '/dashboard');
     router.refresh();
   }
 

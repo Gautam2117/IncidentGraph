@@ -8,6 +8,7 @@ type Profile = { email: string; role: string; username: string };
 
 export default function Header() {
   const router = useRouter();
+  const demoMode = process.env.NEXT_PUBLIC_INCIDENTGRAPH_DEMO_MODE === 'true';
   const [profile, setProfile] = useState<Profile | null>(null);
   useEffect(() => {
     const handleUnauthorized = () => {
@@ -36,11 +37,11 @@ export default function Header() {
       <div className="flex items-center gap-3">
         <div className="hidden md:flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          <span className="text-slate-400">Authenticated</span>
+          <span className="text-slate-400">{demoMode ? 'Showcase mode' : 'Authenticated'}</span>
           <span className="text-slate-200">{profile?.email || 'Loading…'}</span>
         </div>
         <span className="rounded-md border border-cyan-900 bg-cyan-950/50 px-2 py-1 text-[10px] font-mono uppercase text-cyan-300">{profile?.role || '—'}</span>
-        <button onClick={logout} className="text-xs text-slate-400 hover:text-white">Sign out</button>
+        {demoMode ? <a href="https://github.com/Gautam2117/IncidentGraph" target="_blank" rel="noreferrer" className="text-xs text-slate-400 hover:text-white">GitHub ↗</a> : <button onClick={logout} className="text-xs text-slate-400 hover:text-white">Sign out</button>}
       </div>
     </header>
   );

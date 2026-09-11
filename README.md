@@ -2,6 +2,10 @@
 
 IncidentGraph is a production-grade, multi-agent SRE platform built to autonomously investigate distributed system incidents, synthesize evidence-backed Root Cause Analyses (RCAs), enforce durable human-in-the-loop remediation safety, and continuously benchmark AI reasoning quality against versioned ground-truth scenarios.
 
+[**Launch the public interactive showcase →**](https://incidentgraph.vercel.app)
+
+The hosted showcase is recruiter-friendly and requires no account. It replays deterministic proof data through the real console UI so visitors can trace a SEV-1, inspect evidence lineage, explore topology, review evaluation results, and examine a human-gated remediation plan. It is clearly labeled and does not present fixture output as a live-model benchmark.
+
 ---
 
 ## Architecture Overview
@@ -86,6 +90,8 @@ All metrics below reflect actual execution results recorded in local proof artif
 | **Python Code Coverage** | 80% measured coverage | `pytest --cov=app` | `VERIFIED` |
 | **Security Analysis** | 7,777 LOC scanned, 0 High/Medium | `bandit -r services/control-plane/app` | `VERIFIED` |
 | **Dependency Audits** | 0 vulnerabilities | `pip-audit`, `npm audit` | `VERIFIED` |
+| **Public Showcase E2E** | 3 critical journeys passing | `npm run test:e2e:showcase` | `VERIFIED` |
+| **Vercel Production** | Public HTTPS deployment | [incidentgraph.vercel.app](https://incidentgraph.vercel.app) | `LIVE` |
 | **k6 Load Performance** | 5,101 reqs, 168.13 req/s, p95=84.41ms | `k6 run performance/k6-smoke.js` | `VERIFIED` |
 | **Playwright E2E Flow** | 2 spec suites passed across 19 pages | `npx playwright test` | `VERIFIED` |
 | **Docker Compose Stack** | 17 containers UP & healthy | [`artifacts/docker_e2e_proof_results.json`](./artifacts/docker_e2e_proof_results.json) | `VERIFIED` |
@@ -99,7 +105,7 @@ All metrics below reflect actual execution results recorded in local proof artif
 | Feature | External Status | Reason |
 |---|---|---|
 | **Live AI Reasoning Benchmark** | `EXTERNALLY_BLOCKED` | Configured `OPENAI_API_KEY` is a dummy placeholder (`mock-key-or-set-your-key`). Fake model providers are prohibited from generating live benchmark claims. |
-| **AWS Cloud Live Apply** | `EXTERNALLY_BLOCKED` | `terraform plan` is static-verified (47 resources). Live cloud deployment requires AWS credentials. |
+| **AWS Cloud Live Apply** | `INTENTIONALLY_DEFERRED` | `terraform plan` is static-verified (47 resources). The full multi-AZ stack has an explicit $150/month budget guardrail and requires a production domain/TLS setup, so it is not silently provisioned for a portfolio demo. |
 
 ---
 

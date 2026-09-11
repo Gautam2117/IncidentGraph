@@ -6,7 +6,8 @@
     "dev:console": "npm --prefix apps/console run dev",
     "build:console": "npm --prefix apps/console run build",
     "lint": "npm --prefix apps/console run lint",
-    "typecheck": "npm --prefix apps/console run typecheck"
+    "typecheck": "npm --prefix apps/console run typecheck",
+    "verify:claims": "python3 scripts/verify_resume_claims.py"
   },
   "workspaces": [
     "apps/*"

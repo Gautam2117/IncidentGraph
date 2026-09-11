@@ -73,6 +73,6 @@ We took immediate action:
 ### Q: How is the system deployed across Docker, Kubernetes, and AWS?
 **Answer**: 
 "IncidentGraph supports three infrastructure targets:
-- **Docker Compose**: 17 containers for complete single-node local development, including microservices, control plane, Celery worker, PostgreSQL, Redis, and OpenTelemetry stack.
+- **Docker Compose**: 17 long-running containers plus 2 one-shot init jobs for complete single-node local development, including microservices, control plane, Celery worker, PostgreSQL, Redis, and the OpenTelemetry stack.
 - **Kubernetes / Helm**: Chart located in `deployments/helm/incidentgraph`. Verified on a local `kind` cluster with 17/17 pods `1/1 Running` and `securityContext` configured with explicit non-root UIDs.
 - **AWS ECS / Fargate (Terraform)**: Modular Terraform IaC in `deployments/terraform` deploying VPC across 2 AZs, ECS Fargate services, multi-AZ RDS PostgreSQL with `pgvector`, ElastiCache Redis, ALB with HTTPS, and Secrets Manager. Static plan validated with 47 resources to add."

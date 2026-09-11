@@ -1,6 +1,6 @@
 # IncidentGraph — Final Validation Matrix
 
-All local non-external implementation and verification items are **VERIFIED**. Live model reasoning evaluation and live AWS cloud apply are marked as **EXTERNALLY_BLOCKED** due to missing live external credentials.
+All local non-external implementation and verification items are **VERIFIED**, and the public portfolio showcase is **LIVE** on Vercel. Live-model reasoning remains **EXTERNALLY_BLOCKED**; the full AWS cloud apply is **INTENTIONALLY_DEFERRED** because of recurring cost and production domain/TLS requirements.
 
 | Area | Acceptance condition | Evidence required | Status |
 |---|---|---|---|
@@ -30,14 +30,15 @@ All local non-external implementation and verification items are **VERIFIED**. L
 | Auth & RBAC | secure login/session + Viewer/Engineer/Admin | security/E2E | `VERIFIED` (`app/core/auth.py` & `test_auth.py`) |
 | Audit | user + agent privileged actions visible | UI/API test | `VERIFIED` (`AuditEvent` model & `audit_api.py`) |
 | Security | prompt/tool/upload/webhook tests pass | suite report | `VERIFIED` (Bandit 0 High/Medium, pip/npm audit 0 vulnerabilities) |
-| Docker Stack | full stack via Compose | clean run | `VERIFIED` (`artifacts/docker_e2e_proof_results.json` [17 containers healthy]) |
+| Docker Stack | full stack via Compose | clean run | `VERIFIED` (17 long-running containers healthy + 2 one-shot init jobs complete) |
 | Kubernetes | Helm deploy to kind/k3d | smoke test | `VERIFIED` (`artifacts/k8s_helm_smoke_proof.json` [17/17 pods 1/1 Running]) |
 | Terraform IaC | fmt/validate/plan clean | CI plan artifact | `VERIFIED` (`artifacts/terraform_plan_proof.json` [47 resources to add]) |
-| AWS Live Deployment | AWS cloud apply | live cloud smoke | `EXTERNALLY_BLOCKED` (Requires live production AWS provider credentials) |
+| Public Portfolio Deployment | Vercel production | live HTTPS UI + demo API smoke | `LIVE` (`https://incidentgraph.vercel.app`) |
+| AWS Full-Stack Deployment | AWS cloud apply | live cloud smoke | `INTENTIONALLY_DEFERRED` (47-resource static plan verified) |
 | Live AI Reasoning Quality | 36 incident benchmark | live model eval | `EXTERNALLY_BLOCKED` (Requires live OpenAI/LLM API credentials) |
-| Performance | API/retrieval/tool/load benchmarks captured | benchmark artifact | `VERIFIED` (k6 load test: 5,101 reqs, 168.13 req/s, 100% success, p95=84.41ms) |
+| Performance | API/retrieval/tool/load benchmarks captured | benchmark artifact | `VERIFIED` (k6 load test: 3,413 reqs, 168.63 req/s, 0% failed, p95=87.44ms) |
 | UI | every required console screen works on real data | Playwright test | `VERIFIED` (`npx playwright test` passed across 19 routes) |
 
 ---
 
-> **Completion Summary**: "All non-external requirements are verified. External verification remains blocked for: live model benchmark (requires live OpenAI/LLM API credentials) and AWS cloud infrastructure apply (requires live AWS provider credentials)."
+> **Completion Summary**: "The public showcase is live and production-verified on Vercel. The full backend is locally/container verified, the AWS plan is static-verified but intentionally not applied, and no live-model quality claim is made without provider credentials."

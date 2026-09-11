@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import pytest
 from httpx import AsyncClient
@@ -24,7 +24,10 @@ async def test_scenario_eval_metric_computation(db_session: AsyncSession) -> Non
 
 
 @pytest.mark.asyncio
-async def test_batch_eval_runner(db_session: AsyncSession) -> None:
+async def test_batch_eval_runner(
+    db_session: AsyncSession, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("app.eval.exporter.EVAL_RESULTS_DIR", str(tmp_path))
     # Run evaluation across first 3 scenarios
     summary = await run_batch_eval(
         db_session,
@@ -40,8 +43,8 @@ async def test_batch_eval_runner(db_session: AsyncSession) -> None:
     assert 0.0 <= summary.overall_pass_rate <= 1.0
     assert len(summary.metrics) == 3
 
-    # Verify JSON export file exists in eval-results/
-    assert os.path.exists(f"eval-results/eval_{summary.eval_id}.json")
+    # Export tests must never mutate the repository's canonical proof artifacts.
+    assert (tmp_path / f"eval_{summary.eval_id}.json").exists()
 
 
 def test_metric_scorer_rewards_supported_known_result() -> None:

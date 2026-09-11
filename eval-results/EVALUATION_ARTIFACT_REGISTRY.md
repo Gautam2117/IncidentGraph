@@ -12,12 +12,12 @@ This registry tracks the hygiene status of all historical and current evaluation
 
 | Artifact | Purpose / Measured Metric | Status | Timestamp |
 |---|---|---|---|
-| [`artifacts/docker_e2e_proof_results.json`](../artifacts/docker_e2e_proof_results.json) | Real 17-container Docker Compose stack launch, fault injection, before/after telemetry, human approval, sandbox remediation & recovery verification | `CURRENT` | 2026-08-13T15:23:18Z |
+| [`artifacts/docker_e2e_proof_results.json`](../artifacts/docker_e2e_proof_results.json) | Real Docker Compose launch (17 long-running containers + 2 init jobs), fault injection, before/after telemetry, human approval, sandbox remediation & recovery verification | `CURRENT` | 2026-08-13T15:23:18Z |
 | [`artifacts/k8s_helm_smoke_proof.json`](../artifacts/k8s_helm_smoke_proof.json) | Local `kind` cluster deployment, Helm chart installation, 17/17 pods 1/1 `Running`, and control-plane incident smoke flow | `CURRENT` | 2026-08-13T15:36:19Z |
 | [`artifacts/terraform_plan_proof.json`](../artifacts/terraform_plan_proof.json) | Terraform `init`, `validate`, and 47-resource static `plan` output | `CURRENT` | 2026-08-13T15:37:50Z |
 | [`eval-results/rag_benchmark.json`](./rag_benchmark.json) | Hybrid RAG Recall@5 evaluation (PostgreSQL pgvector + FTS RRF) yielding 100% clean offline recall (1.00 hybrid RRF, N=5) | `CURRENT` | 2026-08-13T15:54:26Z |
-| [`eval-results/k6-summary.json`](./k6-summary.json) | k6 load performance test (5,101 reqs, 168.13 req/s, 100% success, p95=84.41ms) | `CURRENT` | 2026-08-13T15:27:53Z |
-| [`eval-results/bandit.json`](./bandit.json) | Bandit security scan (7,777 LOC, 0 High, 0 Medium issues) | `CURRENT` | 2026-08-13T15:23:33Z |
+| [`eval-results/k6-summary.json`](./k6-summary.json) | k6 load performance test (3,413 reqs, 168.63 req/s, 0% failed, p95=87.44ms) | `CURRENT` | 2026-08-13T15:27:53Z |
+| [`eval-results/bandit.json`](./bandit.json) | Bandit security scan (8,338 LOC, 0 High, 0 Medium issues) | `CURRENT` | 2026-08-13T15:23:33Z |
 | [`eval-results/pip-audit.json`](./pip-audit.json) | Python dependency vulnerability audit (0 vulnerabilities) | `CURRENT` | 2026-08-13T15:23:45Z |
 
 ---
@@ -43,5 +43,6 @@ This registry tracks the hygiene status of all historical and current evaluation
 ## Summary of Truthful Baselines
 
 - **Live Model Quality**: `EXTERNALLY_BLOCKED` (Requires live LLM API credentials)
-- **AWS Cloud Live Apply**: `EXTERNALLY_BLOCKED` (Requires live AWS credentials)
+- **Public Showcase**: `LIVE` at `https://incidentgraph.vercel.app`
+- **AWS Cloud Live Apply**: `INTENTIONALLY_DEFERRED` (47-resource plan verified; live apply avoided because of recurring cost and production domain/TLS requirements)
 - **All Non-External Code / Infra / Security Requirements**: `VERIFIED`

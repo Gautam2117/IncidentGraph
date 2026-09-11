@@ -190,7 +190,12 @@ export function demoResponse(method: string, segments: string[], searchParams: U
   if (path === 'auth/me') return Response.json({ email: 'recruiter@showcase.demo', username: 'Portfolio Guest', role: 'viewer' });
   if (path === 'health/live') return Response.json({ status: 'healthy', timestamp: now, service: 'incidentgraph-showcase' });
   if (path === 'health/ready') return Response.json({ status: 'ready', timestamp: now, components: { showcase: { status: 'healthy', message: 'Verified artifact replay' }, deployment: { status: 'healthy', message: 'Vercel serverless' } } });
-  if (path === 'health/version') return Response.json({ name: 'IncidentGraph', version: '1.0.1', environment: 'public-showcase', git_sha: '7f99382' });
+  if (path === 'health/version') return Response.json({
+    name: 'IncidentGraph',
+    version: '1.0.1',
+    environment: 'public-showcase',
+    git_sha: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? process.env.GIT_SHA ?? 'local',
+  });
   if (path === 'incidents') return Response.json(demoIncidents);
   if (/^incidents\/[^/]+\/timeline$/.test(path)) return Response.json(demoTimeline);
   if (/^incidents\/[^/]+$/.test(path)) return Response.json(demoIncidents.find((item) => item.id === segments[1]) ?? demoIncidents[0]);

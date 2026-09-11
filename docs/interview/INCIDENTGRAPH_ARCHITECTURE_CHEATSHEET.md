@@ -14,7 +14,7 @@ Quick-reference technical cheatsheet for system design and code architecture rev
 | **RAG & Search** | PostgreSQL / pgvector / FTS | PostgreSQL 16, pgvector 0.8 | Semantic vector search + Full-Text Search + Reciprocal Rank Fusion (RRF) |
 | **Async Worker** | Celery / Redis | Celery 5.4, Redis 7.4 | Background job execution, task broker, cache store |
 | **Observability** | OpenTelemetry / Prometheus / Loki / Tempo / Grafana | OTEL 0.135, Prom v3.5, Loki 3.5, Tempo 2.8, Grafana 12.1 | Distributed trace collection, log ingestion, metric scraping, visualization |
-| **Containers & K8s** | Docker Compose / Helm / Kind | Docker 27+, Helm v3, Kind v1.36 | Local 17-container stack, Kubernetes Helm package deployment |
+| **Containers & K8s** | Docker Compose / Helm / Kind | Docker 27+, Helm v3, Kind v1.36 | Local 17-runtime-container stack (+2 init jobs), Kubernetes Helm package deployment |
 | **Cloud IaC** | Terraform / AWS ECS Fargate | Terraform v1.15, AWS Provider v5.100 | Multi-AZ VPC, ECS Fargate, RDS PostgreSQL, ElastiCache Redis, ALB |
 
 ---

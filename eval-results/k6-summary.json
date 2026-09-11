@@ -119,7 +119,7 @@
         }
     },
     "setup_data": {
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsb2FkdGVzdEBpbmNpZGVudGdyYXBoLmxvY2FsIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzg2NjIyODMzfQ.39ATiJT-nQC1SNGIg4wvj98PFUqx-UIe7oGpz6pYRv0"
+        "token": "[REDACTED_FROM_PROOF_ARTIFACT]"
     },
     "root_group": {
         "id": "d41d8cd98f00b204e9800998ecf8427e",

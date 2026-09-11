@@ -70,10 +70,10 @@ During adversarial audit, we discovered that the agent was simply reading the gr
 "The entire stack is verified end-to-end:
 - **81 backend pytest tests passing** (80% coverage).
 - **Bandit static analysis clean** (0 High/Medium issues).
-- **k6 load test**: 5,101 requests at 168 req/s with 0% failure and p95 latency of 84.41 ms.
+- **k6 load test**: 3,413 requests at 168.63 req/s with 0% failure and p95 latency of 87.44 ms.
 - **Playwright E2E browser tests**: Passing across all 19 console routes.
-- **Docker Compose**: 17 containers healthy (`scripts/execute_docker_e2e_proof.py`).
+- **Docker Compose**: 17 long-running containers healthy plus 2 completed init jobs (`scripts/execute_docker_e2e_proof.py`).
 - **Kubernetes / Helm**: 17/17 pods 1/1 `Running` on a local `kind` cluster.
 - **Terraform**: 47-resource static plan validated.
 
-External execution state is explicitly tracked as `EXTERNALLY_BLOCKED` for live LLM API keys and AWS Cloud deployment, demonstrating complete provenance integrity."
+The recruiter-facing product is live at `incidentgraph.vercel.app`. Be precise that it is a deterministic showcase deployment: the full backend stack is locally/container verified, the 47-resource AWS plan is static-verified but intentionally not applied, and live-model quality is not claimed without provider credentials."

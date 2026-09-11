@@ -75,7 +75,7 @@ flowchart TD
 3. **Deterministic Sandbox Remediation**: Strict Pydantic schema validation preventing arbitrary command/shell injection, requiring explicit human review and approval for allow-listed mitigation actions.
 4. **Comprehensive AI Evaluation Suite**: Automated benchmark metrics evaluating RCA accuracy, primary service identification, evidence recall, unsupported claim rate, tool-use correctness, and latency/token cost tracking.
 5. **Full Observability & Telemetry Integration**: Native OpenTelemetry collector pipeline exporting metrics to Prometheus, logs to Loki, and traces to Tempo.
-6. **Production Infrastructure & Deployment**: Containerized with Docker Compose (17 containers), packaged as a Helm chart for Kubernetes (17 healthy workloads), and defined via AWS ECS/Fargate Terraform IaC.
+6. **Production Infrastructure & Deployment**: Containerized with Docker Compose (17 long-running containers plus 2 one-shot init jobs), packaged as a Helm chart for Kubernetes (17 healthy workloads), and defined via AWS ECS/Fargate Terraform IaC.
 
 ---
 
@@ -83,18 +83,20 @@ flowchart TD
 
 All metrics below reflect actual execution results recorded in local proof artifacts.
 
+`npm run verify:claims` is a fail-closed CI gate: it cross-checks the featured numbers below against the committed JSON evidence, validates the six services' telemetry wiring, rejects stale headline metrics, and confirms no authentication token remains in the load-test artifact.
+
 | Metric | Measured Value | Provenance Source | Status |
 |---|---|---|---|
 | **RAG Recall@5** | 100% (1.00 hybrid RRF, N=5) | [`eval-results/rag_benchmark.json`](./eval-results/rag_benchmark.json) | `VERIFIED` |
 | **Backend Test Suite** | 81 tests passing (100% pass) | `pytest services/control-plane/tests` | `VERIFIED` |
 | **Python Code Coverage** | 80% measured coverage | `pytest --cov=app` | `VERIFIED` |
-| **Security Analysis** | 7,777 LOC scanned, 0 High/Medium | `bandit -r services/control-plane/app` | `VERIFIED` |
+| **Security Analysis** | 8,338 LOC scanned, 0 High/Medium | [`eval-results/bandit.json`](./eval-results/bandit.json) | `VERIFIED` |
 | **Dependency Audits** | 0 vulnerabilities | `pip-audit`, `npm audit` | `VERIFIED` |
 | **Public Showcase E2E** | 3 critical journeys passing | `npm run test:e2e:showcase` | `VERIFIED` |
 | **Vercel Production** | Public HTTPS deployment | [incidentgraph.vercel.app](https://incidentgraph.vercel.app) | `LIVE` |
-| **k6 Load Performance** | 5,101 reqs, 168.13 req/s, p95=84.41ms | `k6 run performance/k6-smoke.js` | `VERIFIED` |
+| **k6 Load Performance** | 3,413 reqs, 168.63 req/s, 0% failed, p95=87.44ms | [`eval-results/k6-summary.json`](./eval-results/k6-summary.json) | `VERIFIED` |
 | **Playwright E2E Flow** | 2 spec suites passed across 19 pages | `npx playwright test` | `VERIFIED` |
-| **Docker Compose Stack** | 17 containers UP & healthy | [`artifacts/docker_e2e_proof_results.json`](./artifacts/docker_e2e_proof_results.json) | `VERIFIED` |
+| **Docker Compose Stack** | 17 runtime containers healthy; 2 init jobs complete | [`artifacts/docker_e2e_proof_results.json`](./artifacts/docker_e2e_proof_results.json), [`docker-compose.yml`](./docker-compose.yml) | `VERIFIED` |
 | **Kubernetes / Helm** | 17/17 pods 1/1 `Running` on kind cluster | [`artifacts/k8s_helm_smoke_proof.json`](./artifacts/k8s_helm_smoke_proof.json) | `VERIFIED` |
 | **Terraform IaC Plan** | 47 resources to add (static plan) | [`artifacts/terraform_plan_proof.json`](./artifacts/terraform_plan_proof.json) | `VERIFIED` |
 
@@ -119,7 +121,7 @@ cd IncidentGraph
 # 2. Copy environment blueprint
 cp .env.example .env
 
-# 3. Launch full 17-container stack
+# 3. Launch 17 runtime containers and 2 one-shot init jobs
 DOCKER_HOST=unix:///$HOME/.colima/default/docker.sock docker-compose up -d --build
 
 # 4. Verify stack health

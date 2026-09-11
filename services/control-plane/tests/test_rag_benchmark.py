@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,7 +12,9 @@ from app.rag.store import RAGStore
 
 
 @pytest.mark.asyncio
-async def test_rag_retrieval_benchmark_performance(db_session: AsyncSession) -> None:
+async def test_rag_retrieval_benchmark_performance(
+    db_session: AsyncSession, tmp_path: Path
+) -> None:
     """IG-514 through IG-518: Evaluates recall, precision, MRR, NDCG, and latency."""
     store = RAGStore()
 
@@ -27,9 +32,6 @@ async def test_rag_retrieval_benchmark_performance(db_session: AsyncSession) -> 
             db_session, arch["id"], arch["title"], arch["content"], category="architecture"
         )
 
-    import json
-    import os
-
     v_res = await evaluate_rag_mode(db_session, mode="vector", store=store)
     l_res = await evaluate_rag_mode(db_session, mode="lexical", store=store)
     h_res = await evaluate_rag_mode(db_session, mode="hybrid", store=store)
@@ -39,11 +41,10 @@ async def test_rag_retrieval_benchmark_performance(db_session: AsyncSession) -> 
     assert 0.0 <= h_res.precision_at_5 <= 1.0
     assert h_res.mrr >= 0.6
 
-    os.makedirs("eval-results", exist_ok=True)
     report = {
         "vector_only": v_res.model_dump(),
         "lexical_only": l_res.model_dump(),
         "hybrid_rrf": h_res.model_dump(),
     }
-    with open("eval-results/rag_benchmark.json", "w") as f:
+    with (tmp_path / "rag_benchmark.json").open("w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
